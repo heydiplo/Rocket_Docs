@@ -28,8 +28,18 @@ $(document).ready(function () {
 
       $.ajax(
         buildRequestParams($modal.find('.modal-body'), $triggerButton.data('url'), $triggerButton.data('request-method'))
-      ).done(function(data, textStatus, jqXHR) {
+      ).complete(function(jqXHR, textStatus) {
         var response = jqXHR.responseText;
+
+        var json;
+
+        try {
+          json = JSON.parse(response);
+        } catch (e) { }
+
+        if (json) {
+          response = JSON.stringify(json, null, ' ');
+        }
 
         $response.html('');
         $response.text(response);
@@ -106,7 +116,7 @@ $(document).ready(function () {
     if (method === 'GET' && params) {
       content += paramsInputTable(params, savedParams);
     } else {
-      var regex = /\{[^\s]+\}/;
+      var regex = /\{[^\s\/]+\}/;
       var match = regex.exec(url);
       if (match && match.length !== 0) {
         var tempParams = {};
